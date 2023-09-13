@@ -25,6 +25,10 @@ const fetchTiles = async (container: HTMLElement, iframeHtml: HTMLElement) => {
   return allTiles;
 };
 
+const getAvailableSlots = (text: string) => {
+  return Number(text.split(' / ')[0] ?? 0);
+};
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'start') {
     const iframe = document.querySelector('#ifm') as HTMLIFrameElement;
@@ -37,11 +41,30 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
       (async () => {
         const tiles = await fetchTiles(container, iframeHtml);
-        console.log(tiles);
+
+        const sortedTiles = tiles.sort((leftTile, rightTile) => {
+          const leftTilePlayers = getAvailableSlots(
+            leftTile.querySelector('.number-of-players')?.textContent as string
+          );
+
+          const rightTilePlayers = getAvailableSlots(
+            rightTile.querySelector('.number-of-players')?.textContent as string
+          );
+
+          return leftTilePlayers - rightTilePlayers;
+        });
+
+        iframeHtml.scrollTo(0, 0);
+
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        sortedTiles.forEach(el => container.appendChild(el));
+        sendResponse({ isFinished: true });
       })();
     }
   }
 
-  sendResponse({ isFinished: true });
   return true;
 });

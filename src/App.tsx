@@ -1,6 +1,10 @@
+import { useState } from 'react';
+
 const App = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleStart = async () => {
-    console.log('Starting process...');
+    setIsLoading(true);
 
     const [currentTab] = await chrome.tabs.query({
       active: true,
@@ -13,22 +17,27 @@ const App = () => {
       action: 'start'
     });
 
-    console.log(response);
+    if (response.isFinished) {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="border-4 border-gray-900 bg-gray-800 w-80">
-      <div className="p-6">
-        <h1 className="text-lg">title here</h1>
+      <div className="px-6 pb-6">
+        <div className="w-full flex justify-center">
+          <img src="/images/logo.png" className="object-contain" />
+        </div>
         <p className="text-gray-500 text-base mt-2">
           Welcome! To get started, click the botton below.
         </p>
         <div className="mt-4">
           <button
             onClick={handleStart}
+            disabled={isLoading}
             className="py-2 w-full border-2 border-indigo-600 text-white uppercase font-bold text-xs hover:bg-indigo-500 hover:bg-opacity-20 transition-colors ease-in duration-200"
           >
-            Find Games
+            {isLoading ? 'Loading...' : 'Find Games'}
           </button>
           <p className="mt-2 text-xs text-yellow-600">
             ⁉️ After you click the button, the games will be sorted
