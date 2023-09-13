@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import OptionsContainer from './components/OptionsContainer';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,10 +29,12 @@ const App = () => {
         <div className="w-full flex justify-center">
           <img src="/images/logo.png" className="object-contain" />
         </div>
-        <p className="text-gray-500 text-base mt-2">
-          Welcome! To get started, click the botton below.
+        <p className="text-gray-500 text-sm mt-2">
+          Welcome! This is an extension to find games easily in Conflict of
+          Nations. Click the button to get started.
         </p>
-        <div className="mt-4">
+        <OptionsContainer />
+        <div>
           <button
             onClick={handleStart}
             disabled={isLoading}
