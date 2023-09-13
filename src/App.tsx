@@ -16,6 +16,7 @@ const App = () => {
 
     const response = await chrome.tabs.sendMessage(currentTab.id, {
       action: 'start'
+      // TODO: SEND OPTIONS/SETTINGS
     });
 
     if (response.isFinished) {

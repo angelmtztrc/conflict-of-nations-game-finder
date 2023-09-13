@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 
-const useOptionStore = create(set => ({
-  options: {
-    specialFilter: null,
-    removeEmpties: true
-  },
+interface OptionStore {
+  specialFilter: string | null;
+  removeEmpties: boolean;
+  setSpecialFilter: (value: string) => void;
+}
+
+const useOptionStore = create<OptionStore>()(set => ({
+  specialFilter: null,
+  removeEmpties: true,
 
   setSpecialFilter: (value: string) => set(() => ({ specialFilter: value }))
 }));
