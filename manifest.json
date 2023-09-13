@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Conflict of Nations - Game Finder",
+  "description": "An extension to find empty games in Conflict of Nations.",
+  "version": "1.0.0",
+  "action": { "default_popup": "index.html" },
+  "content_scripts": [
+    {
+      "js": ["src/content.ts"],
+      "matches": ["https://www.conflictnations.com/*"]
+    }
+  ],
+  "permissions": ["activeTab", "tabs"]
+}
