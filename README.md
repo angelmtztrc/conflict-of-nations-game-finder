@@ -40,3 +40,7 @@ After that, you'll have a `dist` folder available in the project files.
 Go to `chrome://extensions/`, make sure you have the `developer mode` enabled, and then, click the `Load unpacked` button.
 
 Select the entire `dist` folder and continue. Now, the extension should be available to use in your browser.
+
+> ⁉️ This is a work-in-progress project, so, there may be unhandled errors when using it.
+
+> ⁉️ To run it successfully, make sure you're in the `New Games` tab in Conflict of Nations.
