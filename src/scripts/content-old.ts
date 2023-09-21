@@ -28,7 +28,7 @@ const fetchTiles = async (container: HTMLElement, iframeHtml: HTMLElement) => {
 const getAvailableSlots = (text: string) => {
   return Number(text.split(' / ')[0] ?? 0);
 };
-
+// @ts-ignore
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === 'start') {
     const iframe = document.querySelector('#ifm') as HTMLIFrameElement;
@@ -61,6 +61,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         }
 
         sortedTiles.forEach(el => container.appendChild(el));
+        // @ts-ignore
         sendResponse({ isFinished: true });
       })();
     }
