@@ -1,8 +1,13 @@
 export const specialKinds = [
-  { id: 'X4-FIRST', name: 'X4 Games At Top', value: 'X4-FIRST' },
+  { id: 'X4-ONLY', name: 'X4 Games Only', value: 'X4-ONLY' },
   {
-    id: 'GOLDING-FIRST',
-    name: 'Gold Bonus Games At Top',
-    value: 'GOLDING-FIRST'
+    id: 'SPECIAL-ONLY',
+    name: 'Special Event Only',
+    value: 'SPECIAL-ONLY'
   }
+  // {
+  //   id: 'X10-FIRST',
+  //   name: 'Special Event Only',
+  //   value: 'SPECIAL-ONLY'
+  // }
 ];

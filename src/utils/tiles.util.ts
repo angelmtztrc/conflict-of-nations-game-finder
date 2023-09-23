@@ -1,3 +1,5 @@
+import { ITile } from '../interfaces/tile.interface';
+
 export const startInfiniteScroll = (el: HTMLElement) => {
   return new Promise(resolve => {
     el.scrollTo(0, el.scrollHeight);
@@ -27,20 +29,41 @@ export const getManyTiles = async (
   return allTiles;
 };
 
+export const getTileProperties = (el: HTMLElement): ITile => {
+  const name = el.querySelector('header > h2')?.textContent ?? '';
+  const numberOfPlayers =
+    el.querySelector('.number-of-players')?.textContent ?? '0 / 0';
+  const gameId = Number(
+    el.querySelector('.game-tile-right-column > span')?.textContent ?? 0
+  );
+
+  const isSpecial =
+    (el.querySelector('.game-highlight-tag')?.textContent ?? '') ===
+    'Special Event';
+  const is4XSpeed = name.includes('4X');
+  const is10XSpeed = name.includes('10X');
+
+  const occupiedSlots = Number(numberOfPlayers.split(' / ')[0] ?? 0);
+  const totalSlots = Number(numberOfPlayers.split(' / ')[1] ?? 0);
+
+  return {
+    name,
+    gameId,
+    isSpecial,
+    is4XSpeed,
+    is10XSpeed,
+    occupiedSlots,
+    totalSlots
+  };
+};
+
 export const getOccupiedSlotsFromTile = (el: HTMLElement) => {
   const value = el.querySelector('.number-of-players')?.textContent ?? '0/0';
 
   return Number(value.split(' / ')[0] ?? 0);
 };
 
-export const isFilled = (el: HTMLElement) => {
-  const value = el.querySelector('.number-of-players')?.textContent ?? '0/0';
-
-  const occupiedSlots = value.split(' / ')[0] ?? 0;
-  const totalSlots = value.split(' / ')[1] ?? 0;
-
-  return Boolean(occupiedSlots === totalSlots);
-};
+export const isFilled = (tile: ITile) => tile.totalSlots === tile.occupiedSlots;
 
 export const getSortedTiles = async (
   container: HTMLElement,
@@ -49,14 +72,19 @@ export const getSortedTiles = async (
 ) => {
   const tiles = await getManyTiles(container, rootHtml);
 
-  const filteredSlots = tiles.filter(el => isFilled(el as HTMLElement));
-  const sortedTiles = filteredSlots.sort((leftEl, rightEl) => {
-    // TODO: CREATE A FUNCTION THAT RETURNS THE INFORMATION OF A TILE
-    const leftTilePlayers = getOccupiedSlotsFromTile(leftEl as HTMLElement);
-    const rightTilePlayers = getOccupiedSlotsFromTile(rightEl as HTMLElement);
+  const nonEmptyTiles = tiles.filter(
+    el => !isFilled(getTileProperties(el as HTMLElement))
+  );
 
-    if (leftTilePlayers < rightTilePlayers) return -1;
-    if (leftTilePlayers > rightTilePlayers) return 1;
+  const sortedTiles = nonEmptyTiles.sort((leftEl, rightEl) => {
+    const leftTileProperties = getTileProperties(leftEl as HTMLElement);
+    const rightTileProperties = getTileProperties(rightEl as HTMLElement);
+
+    if (leftTileProperties.occupiedSlots < rightTileProperties.occupiedSlots)
+      return -1;
+
+    if (leftTileProperties.occupiedSlots > rightTileProperties.occupiedSlots)
+      return 1;
 
     return 0;
   });

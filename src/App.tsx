@@ -1,8 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import OptionsContainer from './components/OptionsContainer';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [canStart, setCanStart] = useState(false);
+
+  useEffect(() => {
+    if (!isLoading) {
+      (async () => {
+        const [currentTab] = await chrome.tabs.query({
+          active: true,
+          currentWindow: true
+        });
+
+        if (!currentTab || !currentTab.id) return;
+
+        const response = await chrome.tabs.sendMessage(currentTab.id, {
+          action: 'isReady'
+        });
+
+        if (response.isReady) {
+          setCanStart(true);
+          return;
+        }
+
+        setCanStart(false);
+      })();
+    }
+  }, [isLoading]);
 
   const handleStart = async () => {
     setIsLoading(true);
@@ -24,6 +49,8 @@ const App = () => {
     }
   };
 
+  const handleReload = () => {};
+
   return (
     <div className="border-4 border-gray-900 bg-gray-800 w-80">
       <div className="px-6 pb-6">
@@ -36,16 +63,25 @@ const App = () => {
         </p>
         <OptionsContainer />
         <div>
-          <button
-            onClick={handleStart}
-            disabled={isLoading}
-            className="py-2 w-full border-2 border-indigo-600 text-white uppercase font-bold text-xs hover:bg-indigo-500 hover:bg-opacity-20 transition-colors ease-in duration-200"
-          >
-            {isLoading ? 'Loading...' : 'Find Games'}
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleStart}
+              disabled={isLoading || !canStart}
+              className="py-2 w-full border-2 border-indigo-600 text-white uppercase font-bold text-xs hover:bg-indigo-500 hover:bg-opacity-20 transition-colors ease-in duration-200 disabled:opacity-30"
+            >
+              {isLoading ? 'Loading...' : 'Find Games'}
+            </button>
+            <button
+              onClick={handleReload}
+              className="py-2 px-4 border-2 border-indigo-600 text-white uppercase font-bold text-xs hover:bg-indigo-500 hover:bg-opacity-20 transition-colors ease-in duration-200"
+            >
+              reload
+            </button>
+          </div>
           <p className="mt-2 text-xs text-yellow-600">
-            ⁉️ After you click the button, the games will be sorted
-            automatically.
+            {!canStart
+              ? "🎯 Make sure you're in the New Games tab to start the sorting process."
+              : '⁉️ After you click the button, the games will be sorted automatically.'}
           </p>
         </div>
       </div>
