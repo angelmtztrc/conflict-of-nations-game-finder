@@ -2,11 +2,21 @@
 
 A chrome-extension to help you find new games in Conflict of Nations more easily.
 
-## Run Locally
-
 > ⁉️ The extension is not yet available in the Chrome Web Store (it will be soon), so, you'll have to set it up locally in your browser.
 
-> ⁉️ You'll need to install Node.js in your machine to compile this project and use it. This is temporary.
+## Set up
+
+Go to the [releases section](https://github.com/angelmtztrc/conflict-of-nations-game-finder/releases) on the GitHub repository and download the `dist.zip` file from the latest version.
+
+Unzip the file in your location of preferences.
+
+Then, go to `chrome://extensions/`, make sure you have the `developer mode` enabled, and then, click the `Load unpacked` button.
+
+Select the entire `dist` folder and continue. Now, the extension should be available to use in your browser.
+
+## Run Locally
+
+> ⁉️ You'll need to install Node.js in your machine to compile this project and use it.
 
 First, clone this repository into your local machine using the following command via terminal.
 
