@@ -2,13 +2,13 @@ import { create } from 'zustand';
 
 interface OptionStore {
   specialFilter: string | null;
-  removeEmpties: boolean;
+  removeFull: boolean;
   setSpecialFilter: (value: string) => void;
 }
 
 const useOptionStore = create<OptionStore>()(set => ({
   specialFilter: null,
-  removeEmpties: true,
+  removeFull: true,
 
   setSpecialFilter: (value: string) => set(() => ({ specialFilter: value }))
 }));

@@ -68,15 +68,39 @@ export const isFilled = (tile: ITile) => tile.totalSlots === tile.occupiedSlots;
 export const getSortedTiles = async (
   container: HTMLElement,
   rootHtml: HTMLElement,
+  settings: {
+    filter: string;
+    removeFull: boolean;
+  },
   cb: () => void
 ) => {
   const tiles = await getManyTiles(container, rootHtml);
 
-  const nonEmptyTiles = tiles.filter(
-    el => !isFilled(getTileProperties(el as HTMLElement))
-  );
+  let finalTiles: Element[] = [];
 
-  const sortedTiles = nonEmptyTiles.sort((leftEl, rightEl) => {
+  if (settings.filter === 'X4-ONLY') {
+    finalTiles = tiles.filter(tile => {
+      const properties = getTileProperties(tile as HTMLElement);
+      if (properties.is4XSpeed) return true;
+      return false;
+    });
+  }
+
+  if (settings.filter === 'SPECIAL-ONLY') {
+    finalTiles = tiles.filter(tile => {
+      const properties = getTileProperties(tile as HTMLElement);
+      if (properties.isSpecial) return true;
+      return false;
+    });
+  }
+
+  if (settings.removeFull) {
+    finalTiles = finalTiles.filter(
+      el => !isFilled(getTileProperties(el as HTMLElement))
+    );
+  }
+
+  const sortedTiles = finalTiles.sort((leftEl, rightEl) => {
     const leftTileProperties = getTileProperties(leftEl as HTMLElement);
     const rightTileProperties = getTileProperties(rightEl as HTMLElement);
 

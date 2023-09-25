@@ -1,5 +1,27 @@
 import { getSortedTiles } from '../utils/tiles.util';
 
+const handleMutation: MutationCallback = mutationsList => {
+  for (const mutation of mutationsList) {
+    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+      const targetElement = mutation.target as HTMLElement;
+      if (targetElement.classList.contains('state_active')) {
+        if (targetElement.textContent === 'New Games') {
+          chrome.runtime.sendMessage(true);
+        } else {
+          chrome.runtime.sendMessage(false);
+        }
+      }
+    }
+  }
+};
+const root = document.querySelector('#ifm') as HTMLIFrameElement;
+const tabs = root.contentDocument?.querySelectorAll('.sub_menu_link') ?? [];
+const observer = new MutationObserver(handleMutation);
+
+tabs.forEach(el => {
+  observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+});
+
 chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   if (request.action === 'isReady') {
     const root = document.querySelector('#ifm') as HTMLIFrameElement;
@@ -56,18 +78,17 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
           overlay.style[key] = value;
         });
       })();
-      console.log(overlay);
+
       document.body.appendChild(overlay);
 
       const main = rootBody.querySelector('#s1914') as HTMLElement;
       const container = main.querySelector('#func_game_tiles') as HTMLElement;
 
-      getSortedTiles(container, rootHtml, () => {
+      getSortedTiles(container, rootHtml, request.settings, () => {
+        document.body.removeChild(overlay);
         // @ts-ignore
         sendResponse({ isFinished: true });
       });
-
-      document.body.removeChild(overlay);
     }
 
     return true;

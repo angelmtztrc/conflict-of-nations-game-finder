@@ -1,35 +1,48 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import OptionsContainer from './components/OptionsContainer';
+import useOptionStore from './hooks/useOptionStore';
 
 const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [canStart, setCanStart] = useState(false);
+  const checkIfReady = useCallback(async () => {
+    const [currentTab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+
+    if (!currentTab || !currentTab.id) return;
+
+    const response = await chrome.tabs.sendMessage(currentTab.id, {
+      action: 'isReady'
+    });
+
+    if (response.isReady) {
+      setCanStart(true);
+    } else setCanStart(false);
+  }, []);
+
+  const settings = useOptionStore(state => ({
+    filter: state.specialFilter,
+    removeFull: state.removeFull
+  }));
 
   useEffect(() => {
-    if (!isLoading) {
-      (async () => {
-        const [currentTab] = await chrome.tabs.query({
-          active: true,
-          currentWindow: true
-        });
+    chrome.runtime.onMessage.addListener(message => {
+      if (message === true) {
+        setCanStart(true);
+        return;
+      }
 
-        if (!currentTab || !currentTab.id) return;
+      setCanStart(false);
 
-        const response = await chrome.tabs.sendMessage(currentTab.id, {
-          action: 'isReady'
-        });
-
-        if (response.isReady) {
-          setCanStart(true);
-          return;
-        }
-
-        setCanStart(false);
-      })();
-    }
-  }, [isLoading]);
+      return true;
+    });
+    checkIfReady();
+  }, []);
 
   const handleStart = async () => {
+    if (!canStart) return;
     setIsLoading(true);
 
     const [currentTab] = await chrome.tabs.query({
@@ -40,16 +53,14 @@ const App = () => {
     if (!currentTab || !currentTab.id) return;
 
     const response = await chrome.tabs.sendMessage(currentTab.id, {
-      action: 'start'
-      // TODO: SEND OPTIONS/SETTINGS
+      action: 'start',
+      settings
     });
 
     if (response.isFinished) {
       setIsLoading(false);
     }
   };
-
-  const handleReload = () => {};
 
   return (
     <div className="border-4 border-gray-900 bg-gray-800 w-80">
@@ -71,16 +82,10 @@ const App = () => {
             >
               {isLoading ? 'Loading...' : 'Find Games'}
             </button>
-            <button
-              onClick={handleReload}
-              className="py-2 px-4 border-2 border-indigo-600 text-white uppercase font-bold text-xs hover:bg-indigo-500 hover:bg-opacity-20 transition-colors ease-in duration-200"
-            >
-              reload
-            </button>
           </div>
           <p className="mt-2 text-xs text-yellow-600">
             {!canStart
-              ? "🎯 Make sure you're in the New Games tab to start the sorting process."
+              ? "🎯 Make sure you're in the New Games tab to get started."
               : '⁉️ After you click the button, the games will be sorted automatically.'}
           </p>
         </div>
