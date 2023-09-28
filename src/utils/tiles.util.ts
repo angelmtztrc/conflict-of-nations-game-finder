@@ -76,21 +76,19 @@ export const getSortedTiles = async (
 ) => {
   const tiles = await getManyTiles(container, rootHtml);
 
-  let finalTiles: Element[] = [];
+  let finalTiles: Element[] = [...tiles];
 
   if (settings.filter === 'X4-ONLY') {
-    finalTiles = tiles.filter(tile => {
+    finalTiles = finalTiles.filter(tile => {
       const properties = getTileProperties(tile as HTMLElement);
-      if (properties.is4XSpeed) return true;
-      return false;
+      return properties.is4XSpeed;
     });
   }
 
   if (settings.filter === 'SPECIAL-ONLY') {
-    finalTiles = tiles.filter(tile => {
+    finalTiles = finalTiles.filter(tile => {
       const properties = getTileProperties(tile as HTMLElement);
-      if (properties.isSpecial) return true;
-      return false;
+      return properties.isSpecial;
     });
   }
 
@@ -99,7 +97,7 @@ export const getSortedTiles = async (
       el => !isFilled(getTileProperties(el as HTMLElement))
     );
   }
-
+  console.log(finalTiles);
   const sortedTiles = finalTiles.sort((leftEl, rightEl) => {
     const leftTileProperties = getTileProperties(leftEl as HTMLElement);
     const rightTileProperties = getTileProperties(rightEl as HTMLElement);
